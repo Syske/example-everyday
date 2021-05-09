@@ -26,8 +26,9 @@ public class Example {
     }
 
     public static void testLock(int j) {
-//        final ReentrantLock reentrantLock = mainLock;
-//        reentrantLock.lock();
+        final ReentrantLock reentrantLock = mainLock;
+        // 如果被其它线程占用锁，会阻塞在此等待锁释放
+        reentrantLock.lock();
         try {
             System.out.println("==第" + j + "次调用==start");
             i ++;
@@ -38,7 +39,7 @@ public class Example {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-//            reentrantLock.unlock();
+            reentrantLock.unlock();
         }
     }
 
