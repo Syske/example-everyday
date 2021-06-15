@@ -98,7 +98,7 @@ public class PropertiesUtil {
 
 #### 定义value注解
 
-依然是轻车熟路，这里的`value()`是用来接受我们的配置名称的
+依然是轻车熟路，这里的`value()`是用来接受我们的配置名称的。
 
 ```java
 @Target(ElementType.FIELD)
@@ -167,4 +167,30 @@ public class ConfigurationHandler {
 然后在我们的配置文件中增加对应的配置：
 
 ![](https://gitee.com/sysker/picBed/raw/master/images/20210609085411.png)
+
+#### 运行测试
+
+运行测试下：
+
+![](https://gitee.com/sysker/picBed/raw/master/images/20210609122522.png)
+
+可以看到，我们的配置已经被注入进来了，这样注入配置，既简单又方便。当然，相比于`Spring`的`Value`注解，我们的还是显得比较低级，因为`spring`的`value`注解是支持表达式的，它有一套专门的`Spring EL`，所以我们看的`spring`的`value`是这样写的：
+
+```java
+@Value("${syske.boot.server.name}")
+private String serverName;
+// 或者这样
+@Value("#{syske.boot.server.name}")
+private String serverName;
+```
+
+好了，今天的内容就这么多，我们接下来总结一下。
+
+### 总结
+
+注解本质上只是一种标记，是为了便于我们通过反射操作类的属性、方法等资源，实现我们的高级功能。`value`注解就是获取配置的一种标记，我们通过在实例化对象后对其字段操作，实现配置的自动注入。
+
+在我实际测试的时候，我发现这种配置注入方式，对静态变量也是有效的，但是`spring`的`value`对静态变量是无效的，暂时没有去看`spring`的源码，不知道是实现方式的问题还是`EL`表达式的锅。
+
+原本我以为是因为字段和方法的反射操作都是基于类的实例，所以对于静态方法和变量是没有任何效果的，但是经过实测的时候，发现并非如此，后面再好好研究下。
 

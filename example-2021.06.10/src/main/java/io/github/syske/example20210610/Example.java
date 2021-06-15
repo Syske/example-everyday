@@ -22,27 +22,10 @@ public class Example {
         }
         System.out.println("随机排序前："+ longList);
         long startTime = System.currentTimeMillis();
-//        Collections.shuffle(longList);
-        shuffle(longList);
+        Collections.shuffle(longList);
         long useTime = System.currentTimeMillis() - startTime;
         System.out.println("用时：" + useTime);
         System.out.println("随机排序后："+ longList);
-      /*  Random random = new Random(10L);
-        Collections.shuffle(longList, random);
-        System.out.println("随机排序后："+ longList);*/
     }
 
-    private static void shuffle(List list) {
-        List newList = Lists.newArrayList(list.size());
-        Random random = new Random();
-        random.setSeed(list.size());
-        for (int i = 0; i < list.size(); i++) {
-            int randomIndex = random.nextInt(list.size());
-                Object element = list.get(randomIndex);
-                Object element1 = list.get(i);
-                list.set(i, element);
-                list.set(randomIndex, element1);
-        }
-
-    }
 }
