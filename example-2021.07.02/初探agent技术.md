@@ -112,13 +112,83 @@ java -javaagent:D:\workspace\learning\example-everyday\example-2021.07.02\target
 
 ![](https://gitee.com/sysker/picBed/raw/master/20210702085308.png)
 
-关于`Instrumentation`这个参数，今天先不讲了，我们说的字节码操都是基于这个参数进行操作的。下面我们看下第二种方式
+关于`Instrumentation`这个参数，今天先不讲了，我们说的字节码操都是基于这个参数进行操作的。下面我们看下第二种`Agent`
 
+##### 在主程序之后运行的Agent
 
+相比第一种`agent`，第二种是在`main`方法启动后运行`agent`方法，而且这种方式应用最广泛，比如我们前面说的热部署，就是这种方式实现的，下来我们看下具体如何实现。
 
-#### Agent扩展
+第一步，也是写`Agent`实现类：
 
+```java
+public class AgentMain {
+    public static void agentmain(String args, Instrumentation instrumentation) {
+        System.out.println("AgentMainTest.agentmain start");
+        System.out.println("args: " + args);
+        Class[] allLoadedClasses = instrumentation.getAllLoadedClasses();
+//        for (Class allLoadedClass : allLoadedClasses) {
+        System.out.println("AgentMainTest LoadedClass: " + allLoadedClasses[0].getName());
+//        }
+    }
+}
+```
 
+和第一种`agent`不一样的只有方法名，连参数都一幕一样，这里为了方便查看，我只打印了一行数据。然后我们还需要修改下`maven`的打包配置，需要把之前的`Premain-Class`标签改成`Agent-Class`，其他都一样：
+
+![](https://gitee.com/sysker/picBed/raw/master/images/20210702130622.png)
+
+然后再打包，但是这一次运行方式和第一次不一样，这里的`agent`要通过代码来启动。
+
+我们创建一个测试类，写一个`main`方法，因为要用到`tools`包下的类，所以要先引入`tools`包：
+
+![](https://gitee.com/sysker/picBed/raw/master/images/20210702131006.png)
+
+测试类如下：
+
+```java
+import com.sun.tools.attach.AgentInitializationException;
+import com.sun.tools.attach.AgentLoadException;
+import com.sun.tools.attach.AttachNotSupportedException;
+import com.sun.tools.attach.VirtualMachine;
+import com.sun.tools.attach.VirtualMachineDescriptor;
+
+public class MainTest {
+    public static void main(String[] args) throws IOException, AttachNotSupportedException, AgentLoadException, AgentInitializationException {
+        List<VirtualMachineDescriptor> machineDescriptorList = VirtualMachine.list();
+        for (VirtualMachineDescriptor virtualMachineDescriptor : machineDescriptorList) {
+            if ("io.github.syske.agent.MainTest".equals(virtualMachineDescriptor.displayName())) {
+                String id = virtualMachineDescriptor.id();
+                VirtualMachine virtualMachine = VirtualMachine.attach(id);
+                virtualMachine.loadAgent("D:\\workspace\\learning\\example-everyday\\example-2021.07.02\\target\\example-2021.07.02-1.0-SNAPSHOT.jar",
+                        "syske agentmain");
+                virtualMachine.detach();
+            }
+        }
+        System.out.println("MainTest start");
+    }
+}
+```
+
+这里解释下，`VirtualMachine.list()`是获取当前运行的所有`jvm`虚拟机，运行结果如下：
+
+![](https://gitee.com/sysker/picBed/raw/master/images/20210702131318.png)
+
+其中的`VirtualMachineDescriptor`包含如下信息：
+
+![](https://gitee.com/sysker/picBed/raw/master/images/20210702131601.png)
+
+我们需要从中拿出`displayName`为`io.github.syske.agent.MainTest`，也就是当前类的虚拟机描述信息，然后根据虚拟机`id`拿到对应虚拟机，然后为该虚拟机加载`Agent`包，同时我们还在加在`Agent`包的同时，传入了`syske agentmain`参数，这里的参数和我们第一种方式`=`的方式类似，就相当于给`args`赋值，然后断开虚拟机连接。
+
+运行代码，结果如下：
+
+![](https://gitee.com/sysker/picBed/raw/master/images/20210702132252.png)
+
+根据运行结果，我们发现这种`Agent`并发是在`main`方法之后执行，而是可以在你任意需要的地方调用。相比于第一种，确实要灵活一些。
 
 ### 总结
 
+`Agent`其实在日常开发中经常用到，但是由于我们大部分情况下都用的是继承开发环境，所以感知不强，像日志采集、热部署等基本上都是基于`Agent`来实现的。
+
+当然，`agent`最大的好处在于，它可以有效解耦，实现`jvm`层面的`AOP`，而且它又支持字节码操作，如果你玩的够溜，你就可以实现更多强大功能，而且可玩性还高，简直可以为所欲为。
+
+今天我们暂时就讲这么多，后面抽时间用`agent`实现一些具体的功能，比如字节码操作，让大家真正见识`Agent`的强大之处。
