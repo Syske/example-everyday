@@ -18,9 +18,14 @@ public class MainTest {
                 VirtualMachine virtualMachine = VirtualMachine.attach(id);
                 virtualMachine.loadAgent("D:\\workspace\\learning\\example-everyday\\example-2021.07.02\\target\\example-2021.07.02-1.0-SNAPSHOT.jar",
                         "syske agentmain");
-//                virtualMachine.detach();
+                virtualMachine.detach();
             }
         }
         System.out.println("MainTest start");
+        new MainTest().sayHello();
+    }
+
+    public void sayHello() {
+        System.out.println("agentmain hello");
     }
 }

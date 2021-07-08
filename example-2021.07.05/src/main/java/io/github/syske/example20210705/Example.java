@@ -26,6 +26,7 @@ public class Example extends Thread{
 
     public static void main(String[] args) {
         Example a = new Example("A");
+        long start = System.currentTimeMillis();
         for (int i = 0; i < 50; i++) {
             new Thread(a, "t" + i).start();
         }

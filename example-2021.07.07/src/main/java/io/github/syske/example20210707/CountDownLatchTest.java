@@ -18,10 +18,10 @@ public class CountDownLatchTest {
 //    static Integer count = 0;
     static AtomicInteger count = new AtomicInteger(0);
     private static final int SIZE = 100;
-    private static final ReentrantLock lock = new ReentrantLock();
+//    private static final ReentrantLock lock = new ReentrantLock();
 
     public static void main(String[] args) {
-        ExecutorService executorService = Executors.newCachedThreadPool();
+//        ExecutorService executorService = Executors.newCachedThreadPool();
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < SIZE; i++) {
             new Thread(new TaskPortion(startTime)).start();
@@ -31,7 +31,7 @@ public class CountDownLatchTest {
             executorService.execute(new TaskPortion());
 
         }*/
-        executorService.shutdown();
+//        executorService.shutdown();
     }
 
     static class TaskPortion implements Runnable {
@@ -47,17 +47,19 @@ public class CountDownLatchTest {
 //            lock.lock();
             try {
                 Thread.sleep(1000);
-//                synchronized (count){
+                synchronized (count){
 //                    System.out.println(count++);
                     System.out.println(count.getAndAdd(1));
+//                    if (count == 99) {
                     if (count.get() == 99) {
                         System.out.println("用时:" + (System.currentTimeMillis() - startTime));
                     }
-//                }
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
+//            } finally {
+//                lock.unlock();
             }
-//            lock.unlock();
         }
     }
 }
