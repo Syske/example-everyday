@@ -81,3 +81,6 @@ public class Example {
 
 ### 总结
 
+虽然一开始我拿`countDownLatch`和`CyclicBarrier`做比较，但是事实上，它们两个不具备任何可比性，而且适用的场景也是不一样的。`countDownLatch`核心方法是`countDown`和`aWait`，主要用于控制线程执行顺序；`CyclicBarrier`主要用于有回调需求的场景，而且它的`await`方法也不一样，但是它们都很有用。
+
+最后，希望大家多动手实现，多练习，毕竟学习这件事，还是实践出真知，多线程想要学的好，`juc`下面的类少不了，一起加油吧！
