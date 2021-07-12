@@ -26,6 +26,11 @@ public class Example {
                 try {
                     System.out.println("Semaphore out before: " + finalI + " currentTimeMillis: "+ System.currentTimeMillis());
                     boolean b = s.tryAcquire();
+                    if (!b) {
+                        // doSomething()
+                        System.out.println("未拿到访问权限");
+                        return;
+                    }
                     System.out.println("tryAcquire: " + b + ", " + Thread.currentThread().getName() + " currentTimeMillis: "+ System.currentTimeMillis());
                     Thread.sleep(2000);
                     System.out.println("tryAcquire: " + b + ", " + "thread count: " + finalI);
