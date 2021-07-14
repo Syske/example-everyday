@@ -24,7 +24,8 @@ public class Example {
         TimeUnit unit = TimeUnit.MICROSECONDS;
         BlockingDeque<Runnable> workQueue = new LinkedBlockingDeque<>(50);
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 80; i++) {
+            System.out.println(i + " # " + threadPoolExecutor.toString());
             threadPoolExecutor.execute(() -> {
                 try {
                     Thread.sleep(1000);

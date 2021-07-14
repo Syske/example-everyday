@@ -1,4 +1,4 @@
-### 多线程之Exchanger
+## 多线程之Exchanger
 
 ### 前言
 
@@ -88,3 +88,23 @@ String exchange = exchanger.exchange(taskStr);
 这个方法支持设定超时时间，如果到设定时间依然没有数据交换，该方法会抛出`TimeoutException`异常：
 
 ![](https://gitee.com/sysker/picBed/raw/master/20210713085835.png)
+
+关于`exchanger`的应用场景，我能想到的就两个，一个就是数据校验，两个线程同时操作同一批数据，我们可以对数据最终的一致性做校验，互相验证，比如两个`excel`的数据比对；另外一个场景和这个很类似，就是我们在实际开发经常会遇到方法`A`的运行条件需要根据`B`的运行结果进行优化调整，这时候我们就可以通过`exchanger`来来进行数据交换，然后再继续触发相关操作。
+
+
+
+### 总结
+
+`exchanger`最大的优点是她可以在运行的过程中交换数据，其他的应用场景在遇到具体问题的时候再进一步分析吧。好了，`exchanger`的相关内容就到这里。
+
+今天还要补充一个小知识，是关于`mysql`的，是一个小知识点，也是线上发现的一个小问题，具体来说就是`mysql`的求和语句，如果求和字段的值全部为`null`，那么最终的求和结果是`null`，而不是`0`，这样就会有潜在的空指针异常：
+
+```
+select course_type, sum(order_id) from course GROUP BY course_type
+```
+
+因为`order_id`都是`null`，所以最终`sum(order_id)`就是`null`:
+
+![](https://gitee.com/sysker/picBed/raw/master/images/20210713130829.png)
+
+这样如果你用包装类接收`sum(order_id)`就是`null`，后续在操作它的时候一定要做空指针校验，否则就是个线上`bug`。好了，就这么多，`over`！
