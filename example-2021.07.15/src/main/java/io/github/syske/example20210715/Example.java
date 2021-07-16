@@ -30,8 +30,7 @@ public class Example {
                 String name = Thread.currentThread().getName();
                 System.out.println("hello threadPool: "+ name);
                 countDownLatch.countDown();
-                System.out.println("线程运行结束" + name + " # " + threadPoolExecutor);
-                threadPoolExecutor.shutdown();
+//                System.out.println("线程运行结束" + name + " # " + threadPoolExecutor);
             });
         }
         countDownLatch.await();
@@ -40,6 +39,6 @@ public class Example {
         System.out.println("循环完成，休眠10秒线程池状态 # " + threadPoolExecutor);
         Thread.sleep(10000);
         System.out.println("循环完成，休眠20秒线程池状态 # " + threadPoolExecutor);
-
+//        threadPoolExecutor.shutdown();
     }
 }

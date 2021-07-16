@@ -17,33 +17,33 @@ public class Example {
     public static void main(String[] args) throws InterruptedException {
         int corePoolSize = 10;
         int maximumPoolSize = 30;
-        long keepAliveTime = 20000;
+        long keepAliveTime = 2000;
         TimeUnit unit = TimeUnit.MICROSECONDS;
-        ThreadFactory build = new ThreadFactoryBuilder().setNameFormat("syske-task-%d").build();
-        BlockingDeque<Runnable> workQueue = new LinkedBlockingDeque<>(170);
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, new MyThreadFactory());
-        CountDownLatch countDownLatch = new CountDownLatch(200);
+        BlockingDeque<Runnable> workQueue = new LinkedBlockingDeque<>(60);
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, new MyThreadFactory(), new MyRejectedExecutionHandler());
+//        CountDownLatch countDownLatch = new CountDownLatch(200);
         for (int i = 0; i < 200; i++) {
             System.out.println(i + " # " + threadPoolExecutor);
             threadPoolExecutor.execute(() -> {
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 String name = Thread.currentThread().getName();
                 System.out.println("hello threadPool: "+ name);
-                countDownLatch.countDown();
+//                countDownLatch.countDown();
                 System.out.println("线程运行结束" + name + " # " + threadPoolExecutor);
-                threadPoolExecutor.shutdown();
             });
         }
-        countDownLatch.await();
+        threadPoolExecutor.shutdown();
+//        countDownLatch.await();
         System.out.println("循环完成，现在的线程池状态 # " + threadPoolExecutor);
-        Thread.sleep(10000);
-        System.out.println("循环完成，休眠10秒线程池状态 # " + threadPoolExecutor);
-        Thread.sleep(10000);
-        System.out.println("循环完成，休眠20秒线程池状态 # " + threadPoolExecutor);
+//        Thread.sleep(10000);
+//        System.out.println("循环完成，休眠10秒线程池状态 # " + threadPoolExecutor);
+//        Thread.sleep(10000);
+//        System.out.println("循环完成，休眠20秒线程池状态 # " + threadPoolExecutor);
+
     }
 
     static class MyThreadFactory implements ThreadFactory {
@@ -71,6 +71,20 @@ public class Example {
             if (t.getPriority() != Thread.NORM_PRIORITY)
                 t.setPriority(Thread.NORM_PRIORITY);
             return t;
+        }
+    }
+
+    static class MyRejectedExecutionHandler implements RejectedExecutionHandler {
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            System.out.println("线程池拒绝连接，资源已耗尽：r = " + r + ", executor = " + executor);
+//            throw new RejectedExecutionException();
+            executor.setMaximumPoolSize(100);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
